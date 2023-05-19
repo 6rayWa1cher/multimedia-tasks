@@ -62,15 +62,17 @@ def load_mat_file(filename, fields):
     for field in fields:
         outer_data = mat[field]
         if not hasattr(outer_data, '_fieldnames'):
-            raise ValueError(f"can't load {field} from mat file {filename}: no _fieldnames")
-        for name in outer_data._fieldnames:
-            inner_data = getattr(outer_data, name)
-            normalized_data, max_value_inner = normalize_data(inner_data)
-            max_value = max_value or max_value_inner
-            if max_value != max_value_inner:
-                raise ValueError(f"can't load {field} from mat file {filename}: "
-                                 f"invalid max_value {max_value_inner}, expected {max_value}")
-            out[f"{field}.{name}"] = normalized_data
+            # raise ValueError(f"can't load {field} from mat file {filename}: no _fieldnames")
+            out[field] = outer_data
+        else:
+            for name in outer_data._fieldnames:
+                inner_data = getattr(outer_data, name)
+                normalized_data, max_value_inner = normalize_data(inner_data)
+                max_value = max_value or max_value_inner
+                if max_value != max_value_inner:
+                    raise ValueError(f"can't load {field} from mat file {filename}: "
+                                     f"invalid max_value {max_value_inner}, expected {max_value}")
+                out[f"{field}.{name}"] = normalized_data
     return out, max_value
 
 
